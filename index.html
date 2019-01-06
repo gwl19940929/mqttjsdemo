@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Document</title>
+  <title>航天mqtt演示</title>
   <script type="text/javascript" src="jquery.js"></script>
   <script type="text/javascript">
     
@@ -27,7 +27,7 @@ window.onerror = function (msg, url, line, col, error){
       <h3 style="padding-left: 20px;padding-bottom: 4px;border-bottom: 1px solid #000;">连接</h3>
       <div style="width: 100%;display: flex;justify-content: space-around;align-content: center;">
         <div style="width: 70%;padding-top: 20px;">
-          <input type="text" id="mqttadress" style="border: 1px solid #000;width: 90%;height: 30px;font-size: 14px;line-height: 40px;" placeholder="请输入要连接的网址">
+          <input type="text" id="mqttadress" style="border: 1px solid #000;width: 90%;height: 30px;font-size: 14px;line-height: 40px;" placeholder="请输入要连接的网址" value="mqtt://node81.yanxishe.cc:8083/mqtt">
         </div>
         <div style="width: 30%;display: flex;justify-content: space-around;padding-top: 20px;">
           <button onclick="connect();" style="width: 40%;border: 1px solid #ccc;background: #1E9FFF;color: #fff;height: 30px;border-radius: 4px;line-height: 30px;cursor: pointer;">连接</button>
