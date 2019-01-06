@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+  <script type="text/javascript" src="jquery.js"></script>
+  <script type="text/javascript">
+    
+window.onerror = function (msg, url, line, col, error){
+  if(msg.indexOf("disconnecting")>-1){
+    $("#container").append("mqtt已断开<br>");
+  }
+}
+
+  </script>
+  <style>
+    *{
+      margin:0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+  </style>
+</head>
+<body>
+  <div style="width: 400px;"> 
+    <div style="width: 100%;height: 100px;background-color: lightblue">
+      <h3 style="padding-left: 20px;padding-bottom: 4px;border-bottom: 1px solid #000;">连接</h3>
+      <div style="width: 100%;display: flex;justify-content: space-around;align-content: center;">
+        <div style="width: 70%;padding-top: 20px;">
+          <input type="text" id="mqttadress" style="border: 1px solid #000;width: 90%;height: 30px;font-size: 14px;line-height: 40px;" placeholder="请输入要连接的网址">
+        </div>
+        <div style="width: 30%;display: flex;justify-content: space-around;padding-top: 20px;">
+          <button onclick="connect();" style="width: 40%;border: 1px solid #ccc;background: #1E9FFF;color: #fff;height: 30px;border-radius: 4px;line-height: 30px;cursor: pointer;">连接</button>
+          <button onclick="end();" style="width: 40%;border: 1px solid #ccc;height: 30px;border-radius: 4px;line-height: 30px;background-color: #fff;cursor: pointer;">断开</button>
+        </div>
+      </div>
+    </div>
+    
+    
+    <div style="width: 100%;height: 100px;background-color: lightblue;margin-top: 20px;">
+      <h3 style="padding-left: 20px;padding-bottom: 4px;border-bottom: 1px solid #000;">订阅</h3>
+      <div style="width: 100%;display: flex;justify-content: space-around;align-content: center;">
+        <div style="width: 70%;padding-top: 20px;">
+          <input type="text" id="subpublishtopic" style="border: 1px solid #000;width: 90%;height: 30px;font-size: 14px;line-height: 40px;" placeholder="请输入要订阅的主题">
+        </div>
+        <div style="width: 30%;display: flex;justify-content: space-around;padding-top: 20px;">
+          <button onclick="subpublish();" style="width: 80%;border: 1px solid #ccc;background: #1E9FFF;color: #fff;height: 30px;border-radius: 4px;line-height: 30px;cursor: pointer;">订阅这个主题</button>
+        </div>
+      </div>
+    </div>
+    
+    <div style="width: 100%;height: 140px;background-color: lightblue;margin-top: 20px;">
+      <h3 style="padding-left: 20px;padding-bottom: 4px;border-bottom: 1px solid #000;">推送消息</h3>
+      <div style="width: 100%;display: flex;justify-content: space-around;align-content: center;">
+        <div style="width: 70%;padding-top: 20px;">
+          <input type="text" id="publicmsg" style="border: 1px solid #000;width: 90%;height: 30px;font-size: 14px;line-height: 40px;" placeholder="请输入要发送的消息">
+          <input type="text" id="publictopic" style="border: 1px solid #000;width: 90%;height: 30px;font-size: 14px;line-height: 40px;margin-top: 20px;" placeholder="请输入要发送的主题">
+        </div>
+        <div style="width: 30%;display: flex;justify-content: space-around;padding-top: 20px;padding-bottom: 20px;align-items: flex-end;">
+          <button onclick="publish();" style="width: 80%;border: 1px solid #ccc;background: #1E9FFF;color: #fff;height: 30px;border-radius: 4px;line-height: 30px;cursor: pointer;">推送这条消息</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="container" style="width: 100%;background-color: black;color:#fff;height:500px;margin-top: 20px;overflow: scroll;"></div>
+  </div>
+  <script src="mqtt.min.js"></script>
+<script>
+//var mqtt = require('mqtt')
+//mqtt://node81.yanxishe.cc:8083/mqtt
+  var client;
+  function connect(){
+    var url = $("#mqttadress").val();
+    if (url == "") {
+
+      $("#container").append("请输入正确的mqtt地址"+"<br>")
+      return;
+    }
+    client = mqtt.connect(url)
+
+
+    client.on('connect', function () {
+      $("#container").append(url+'连接成功<br>');
+    })
+    client.on('message', function (topic, message) {
+      // message is Buffer
+      $("#container").append("收到一条消息:<br>topic:"+topic.toString()+"<br>message:"+message.toString()+"<br>")
+      //client.end()
+    })
+
+  }
+
+
+function publish(){
+  var str = $("#publicmsg").val(),
+      Ptopic = $("#publictopic").val();
+  if(Ptopic == ""){
+    $("#container").append('请输入要发送的topic<br>');
+  }
+  if (str == "") {
+    str = "nodata";
+  }
+  var obj = {
+    "data":str,
+    "timestamp":new Date().getTime()
+  }
+  var pubstr = JSON.stringify(obj);
+  client.publish(Ptopic, pubstr)
+}
+
+function subpublish(){
+  var subP = $("#subpublishtopic").val();
+  if (subP == "") {
+      $("#container").append('请输入要订阅的topic<br>');
+      return;
+  }
+  client.subscribe(subP, function (err) {
+    if(!err){
+      $("#container").append("topic"+subP+'订阅成功<br>');
+    }else{
+      $("#container").append('订阅失败<br>');
+    }
+  })
+}
+
+function end(){
+  client.end();
+      $("#container").append('mqtt断开连接<br>');
+}
+
+</script>
+</body>
+</html>
